@@ -5,15 +5,14 @@ from .models import Category, Product
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ["name", "description"]
+        fields = ["name", "slug"]
 
 class ProductSerializer(serializers.ModelSerializer):
     price_after_tax = serializers.SerializerMethodField(method_name='calculate_tax')
 
     class Meta:
         model = Product
-        fields = ["name", "description", "price", "price_after_tax", ]
-        depth = 1 #or category = CategorySerializer()
+        fields = ["name", "description", "price", "price_after_tax", "inventory" ]
 
     def calculate_tax(self, product: Product):
-        return product.price*Decimal(1.1)
+        return product.price*Decimal("1.1")
