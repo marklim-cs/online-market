@@ -3,7 +3,7 @@ from django.utils.text import slugify
 
 class Category(models.Model):
     name = models.CharField(max_length=250)
-    image = models.ImageField(upload_to='categories/%Y/%m/%d', blank=True)
+    image = models.ImageField(upload_to='media/categories/', blank=True)
     slug = models.SlugField(blank=True)
     description = models.TextField(blank=True)
 
@@ -21,7 +21,7 @@ class Product(models.Model):
     name = models.CharField(max_length=250)
     description = models.TextField(blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    image = models.ImageField(upload_to='products/%Y/%m/%d', blank=True)
+    image = models.ImageField(upload_to='media/products', blank=True)
     inventory = models.IntegerField()
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="products")
     created_at = models.DateTimeField(auto_now=True)
