@@ -15,7 +15,7 @@ class Cart:
     def save(self):
         self.session.modified = True
 
-    def add(self, product, quantity=1, modified_quantity=False):
+    def add(self, product, quantity=1, override_quantity=False):
         product_id = str(product["id"])
 
         if product_id not in self.cart:
@@ -24,7 +24,7 @@ class Cart:
                 "price": str(product["price_after_tax"])
             }
 
-        if modified_quantity:
+        if override_quantity:
             self.cart[product_id]["quantity"] = quantity
         else:
             self.cart[product_id]["quantity"] += quantity
@@ -42,7 +42,7 @@ class Cart:
         """
         Loop through cart items and fetch the products from the database
         """
-        product_ids = self.cart.key()
+        product_ids = self.cart.keys()
         products = Product.objects.filter(id__in=product_ids)
         cart = self.cart.copy()
 

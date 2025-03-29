@@ -2,8 +2,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from onlinemarket.products.models import Category, Product
-from onlinemarket.products.serializers import CategorySerializer, ProductSerializer
+from products.models import Category, Product
+from products.serializers import CategorySerializer, ProductSerializer
 
 
 class CategoryList(APIView):
