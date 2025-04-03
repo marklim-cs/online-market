@@ -2,35 +2,42 @@ from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from django_filters.rest_framework import DjangoFilterBackend
 from products.models import Category, Product
 from products.serializers import CategorySerializer, ProductSerializer
-from products.services import filter_products_by_query_params
+from products.filters import ProductFilter
 
 class CategoryList(APIView):
     def get(self, request):
-        categories = Category.objects.all()
-        category_serializer = CategorySerializer(categories, many=True)
+        if not request.GET:
+            categories = Category.objects.all()
+            category_serializer = CategorySerializer(categories, many=True)
+            return Response(category_serializer.data)
 
-        products = filter_products_by_query_params(request)
-        if products:
+        print(request.GET)
+        products = Product.objects.all()
+        filterset = ProductFilter(request.GET, queryset=products)
+        if filterset.is_valid():
+            products = filterset.qs
             product_serializer = ProductSerializer(products, many=True)
-            return Response(product_serializer.data)
-
-        return Response(category_serializer.data)
+            return Response(product_serializer.data, status=status.HTTP_200_OK)
 
 class ProductList(APIView):
     serializer_class = ProductSerializer
 
     def get(self, request, category_slug):
-        category = get_object_or_404(Category, slug=category_slug)
-        category_name = category.name
-        products = Product.objects.filter(category=category)
+        if category_slug:
+            category = get_object_or_404(Category, slug=category_slug)
+            products = Product.objects.filter(category=category)
+        else:
+            products = Product.objects.all()
 
-        filtered_products = filter_products_by_query_params(request, category=category_name)
-        if filtered_products:
-            products = filtered_products
+        filterset = ProductFilter(request.GET, queryset=products)
+        if filterset.is_valid():
+            products = filterset.qs
 
         serializer = self.serializer_class(products, many=True)
+
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, category_slug):

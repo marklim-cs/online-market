@@ -65,22 +65,3 @@ class Cart:
     def clear(self):
         del self.session[settings.CART_SESSION_ID]
         self.save()
-
-def filter_products_by_query_params(request, **kwargs):
-    category = kwargs.get('category', request.query_params.get('category'))
-    to_price = request.query_params.get('to_price')
-    search = request.query_params.get('search')
-
-    if not (category or to_price or search):
-        return None
-
-    products = Product.objects.all()
-
-    if category:
-        products = products.filter(category__name__iexact=category)
-    if to_price:
-        products = products.filter(price__lte=to_price)
-    if search:
-        products = products.filter(name__icontains=search)
-
-    return products
