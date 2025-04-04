@@ -2,21 +2,19 @@ from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from django_filters.rest_framework import DjangoFilterBackend
 from products.models import Category, Product
 from products.serializers import CategorySerializer, ProductSerializer
 from products.filters import ProductFilter
 
 class CategoryList(APIView):
     def get(self, request):
-        if not request.GET:
+        if not request.query_params:
             categories = Category.objects.all()
             category_serializer = CategorySerializer(categories, many=True)
             return Response(category_serializer.data)
 
-        print(request.GET)
         products = Product.objects.all()
-        filterset = ProductFilter(request.GET, queryset=products)
+        filterset = ProductFilter(request.query_params, queryset=products)
         if filterset.is_valid():
             products = filterset.qs
             product_serializer = ProductSerializer(products, many=True)
@@ -32,7 +30,7 @@ class ProductList(APIView):
         else:
             products = Product.objects.all()
 
-        filterset = ProductFilter(request.GET, queryset=products)
+        filterset = ProductFilter(request.query_params, queryset=products)
         if filterset.is_valid():
             products = filterset.qs
 
