@@ -1,4 +1,5 @@
 from decimal import Decimal
+import bleach
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from .models import Category, Product
@@ -15,7 +16,6 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = ["id", "name", "description", "price", "price_after_tax", "inventory", "category", "image"]
         extra_kwargs = {
-            "inventory": {"min_value": 0},
             "name": {"validators": [
                 UniqueValidator(
                     queryset=Product.objects.all()
@@ -24,10 +24,14 @@ class ProductSerializer(serializers.ModelSerializer):
             }
         }
 
-    def validate_price(self, value):
-        if value <= 0:
+    def validate(self, attrs):
+        attrs["name"] = bleach.clean(attrs["name"])
+        if attrs["price"] <= 0:
             raise serializers.ValidationError("Ooops! Price should be at least 0.1")
-        return value
+        if attrs["inventory"] < 0:
+            raise serializers.ValidationError("Nono! Inventory cannot go below zero, sorry!")
+
+        return super().validate(attrs)
 
     def calculate_tax(self, product: Product):
         return product.price*Decimal("1.1")

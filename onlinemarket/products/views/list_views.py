@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
 from rest_framework import status
 from products.models import Category, Product
 from products.serializers import CategorySerializer, ProductSerializer
@@ -17,8 +18,11 @@ class CategoryList(APIView):
         filterset = ProductFilter(request.query_params, queryset=products)
         if filterset.is_valid():
             products = filterset.qs
-            product_serializer = ProductSerializer(products, many=True)
-            return Response(product_serializer.data, status=status.HTTP_200_OK)
+
+            paginator = PageNumberPagination()
+            paginated_products = paginator.paginate_queryset(products, request)
+            product_serializer = ProductSerializer(paginated_products, many=True)
+            return paginator.get_paginated_response(product_serializer.data)
 
 class ProductList(APIView):
     serializer_class = ProductSerializer
@@ -34,9 +38,12 @@ class ProductList(APIView):
         if filterset.is_valid():
             products = filterset.qs
 
-        serializer = self.serializer_class(products, many=True)
+        paginator = PageNumberPagination()
+        paginated_products = paginator.paginate_queryset(products, request)
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        serializer = self.serializer_class(paginated_products, many=True)
+
+        return paginator.get_paginated_response(serializer.data)
 
     def post(self, request, category_slug):
         serializer = self.serializer_class(data=request.data)
