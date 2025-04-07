@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
+from rest_framework.throttling import UserRateThrottle, AnonRateThrottle
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from rest_framework import status
@@ -26,6 +27,7 @@ class CategoryList(APIView):
 
 class ProductList(APIView):
     serializer_class = ProductSerializer
+    throttle_classes = [UserRateThrottle, AnonRateThrottle]
 
     def get(self, request, category_slug):
         if category_slug:
