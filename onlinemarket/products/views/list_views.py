@@ -9,6 +9,8 @@ from products.serializers import CategorySerializer, ProductSerializer
 from products.filters import ProductFilter
 
 class CategoryList(APIView):
+    throttle_scope = 'allusers'
+
     def get(self, request):
         if not request.query_params:
             categories = Category.objects.all()
