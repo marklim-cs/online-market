@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'django_filters',
     'allauth',
     'allauth.account',
+    'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'users',
     'products',
@@ -65,6 +66,7 @@ MIDDLEWARE = [
 CART_SESSION_ID = 'cart'
 
 ROOT_URLCONF = 'onlinemarket.urls'
+AUTH_USER_MODEL = 'users.CustomUser'
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
@@ -82,7 +84,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'django.template.context_processors.request',
             ],
         },
     },
@@ -92,6 +93,22 @@ WSGI_APPLICATION = 'onlinemarket.wsgi.application'
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
+        # "APPS": [
+        #     {
+        #         "client_id": os.getenv("GOOGLE_CLIENT_ID"),
+        #         "secret": os.getenv("GOOGLE_CLIENT_SECRET"),
+        #         "key": "",
+        #         "settings": {
+        #             "scope": [
+        #                 "profile",
+        #                 "email",
+        #             ],
+        #             "auth_params": {
+        #                 "access_type": "online",
+        #             },
+        #         },
+        #     },
+        # ],
         'SCOPE': [
             'profile',
             'email',
